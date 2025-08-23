@@ -7,10 +7,10 @@
     {% if site.icon %}
     <link rel="shortcut icon" type="image/x-icon" href="{{site.icon}}">
     {% endif %}
-    <link href="{{ url_for('static', filename='lib/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='lib/highlight.js/github.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='lib/mermaid/mermaid.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='itso/lib/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='itso/lib/highlight.js/github.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='itso/lib/mermaid/mermaid.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='itso/css/style.css') }}" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -79,11 +79,11 @@
     </footer>
 {% endif %}
 </body>
-<script src="{{ url_for('static', filename='lib/jquery/jquery-2.2.4.min.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/bootstrap/bootstrap.min.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/mermaid/mermaid.min.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/mathjax-2.6.1/MathJax.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/highlight.js/highlight.min.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/lib/jquery/jquery-2.2.4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/lib/bootstrap/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/lib/mermaid/mermaid.min.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/lib/mathjax-2.6.1/MathJax.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/lib/highlight.js/highlight.min.js') }}"></script>
 <script>
     MathJax.Hub.Config({
     tex2jax: {

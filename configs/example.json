@@ -2,11 +2,11 @@
   "lang": "en",
   "date_locale": "en",
   "i18n_file": "i18n/en.json",
-  "posts": "content/posts",
+  "posts": "content/example-posts",
   "site": {
     "title": "Itso Example",
     "nav": "Itso",
-    "icon": "/static/icons/favicon.ico"
+    "icon": "/static/itso/icons/isto-favicon.ico"
   },
   "profile": {
     "enabled": true,
@@ -14,13 +14,13 @@
     "tagline": "Simple Blog System",
     "avatar": {
       "show": true,
-      "src": "/static/example-img/profile.jpeg",
+      "src": "/static/itso/img/profile.jpeg",
       "alt": "Itso"
     },
     "social": [
-      {"name": "Github", "show": true, "icon": "/static/icons/github.svg", "url": "https://github.com/yitso/itso"},
-      {"name": "X", "show": true, "icon": "/static/icons/x.svg", "url": "https://example.com/"},
-      {"name": "Wechat", "show": true, "img": "/static/example-img/qrcode_example.com.png", "icon": "/static/icons/wechat.svg"},
+      {"name": "Github", "show": true, "icon": "/static/itso/icons/github.svg", "url": "https://github.com/yitso/itso"},
+      {"name": "X", "show": true, "icon": "/static/itso/icons/x.svg", "url": "https://example.com/"},
+      {"name": "Wechat", "show": true, "img": "/static/itso/img/qrcode_example.com.png", "icon": "/static/itso/icons/wechat.svg"},
       {"name": "LinkedIn", "show": false}
     ]
   },

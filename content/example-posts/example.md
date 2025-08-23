@@ -12,7 +12,7 @@ summary: Welcome to my blog!
 
 ## Image
 
-![Profile](/static/example-img/profile.jpeg)
+![Profile](/static/itso/img/profile.jpeg)
 
 ## Code Block
 
