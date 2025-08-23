@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('page.all_articles.title') }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <h1 class="page-header">{{ t('page.all_articles.heading') }}</h1>
+
+        {% for article in articles %}
+            <article class="post-item">
+                <h2 class="post-title">
+                    <a href="{{ url_for('article_detail', slug=article.slug) }}">{{ article.title }}</a>
+                </h2>
+                <div class="post-meta">
+                    <span class="text-muted">{{ article.date|date_i18n }}</span>
+                </div>
+                {% if article.summary %}
+                <div class="post-excerpt">
+                    {{ article.summary|safe }}
+                </div>
+                {% endif %}
+            </article>
+            {% if not loop.last %}<hr class="post-divider">{% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

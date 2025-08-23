@@ -1,0 +1,46 @@
+{
+  "lang": "en",
+  "date_locale": "en",
+  "i18n_file": "i18n/en.json",
+  "posts": "content/posts",
+  "site": {
+    "title": "Itso Example",
+    "nav": "Itso",
+    "icon": "/static/icons/favicon.ico"
+  },
+  "profile": {
+    "enabled": true,
+    "name": "Itso",
+    "tagline": "Simple Blog System",
+    "avatar": {
+      "show": true,
+      "src": "/static/example-img/profile.jpeg",
+      "alt": "Itso"
+    },
+    "social": [
+      {"name": "Github", "show": true, "icon": "/static/icons/github.svg", "url": "https://github.com/yitso/itso"},
+      {"name": "X", "show": true, "icon": "/static/icons/x.svg", "url": "https://example.com/"},
+      {"name": "Wechat", "show": true, "img": "/static/example-img/qrcode_example.com.png", "icon": "/static/icons/wechat.svg"},
+      {"name": "LinkedIn", "show": false}
+    ]
+  },
+    "footer": {
+      "enabled": true,
+      "copyright": {
+        "enabled": true,
+        "owner_name": "Itso",
+        "url": "https://github.com/yitso/itso",
+        "license": {
+          "description": "Unless otherwise noted, all content is licensed under ",
+          "name": "CC BY NC 4.0",
+          "url": "https://creativecommons.org/licenses/by-nc/4.0/"
+        }
+      },
+    "nav_links": [
+    ],
+    "legals":[
+      {"name": "icp", "enabled": false, "value": "123", "url": "https://example.com/"},
+      {"name": "mps", "icon": "https://example.com/mps.jpeg","enabled": false, "value": "123", "url": "https://example.com/"}
+    ]
+  }
+}

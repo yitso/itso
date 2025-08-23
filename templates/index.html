@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('home.title') }}{% endblock %}
+
+{% block content %}
+  {% if profile.enabled %}
+  <div class="row home-profile">
+    <div class="col-md-3 text-center">
+      {% if profile.avatar.show %}
+        <img class="profile-avatar img-responsive img-circle center-block"
+             src="{{ profile.avatar.src }}"
+             alt="{{ profile.avatar.alt }}">
+      {% endif %}
+    </div>
+
+    <div class="col-md-9">
+      <h1 class="profile-name">{{ profile.name }}</h1>
+      {% if profile.tagline %}
+        <p class="profile-tagline">{{ profile.tagline }}</p>
+      {% endif %}
+
+        <div class="profile-socials">
+          {% for s in profile.social %}
+            {% if s.show %}
+              <span class="social-link" title="{{ s.name }}">
+                {% if s.url %}
+                  <a href="{{ s.url }}" target="_blank" rel="noopener">
+                    <img class="social-icon" src="{{ s.icon }}" alt="{{ s.name }}">
+                  </a>
+                {% else %}
+                  <img class="social-icon" src="{{ s.icon }}" alt="{{ s.name }}"
+                       {% if s.img %} onclick="toggleQR(this)" style="cursor:pointer;" {% endif %}>
+                {% endif %}
+
+                {% if s.img %}
+                  <img class="social-qr" src="{{ s.img }}" alt="{{ s.name }} QR Code">
+                {% endif %}
+              </span>
+            {% endif %}
+          {% endfor %}
+        </div>
+    </div>
+  </div>
+  <hr>
+  {% endif %}
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            {% for article in articles %}
+                <article class="post-preview">
+                    <h2><a href="{{ url_for('article_detail', slug=article.slug) }}">{{ article.title }}</a></h2>
+                    <p class="post-meta">{{ article.date|date_i18n }}</p>
+                    <div class="post-summary">
+                        {{ article.summary|safe }}
+                    </div>
+                </article>
+                <hr>
+            {% endfor %}
+           <div class="text-right">
+            <a class="view-all-link" href="/posts">
+                >>> {{ t('home.view_all_articles') }}
+            </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

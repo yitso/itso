@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} ｜ {{ site.title }}</title>
+    {% if site.icon %}
+    <link rel="shortcut icon" type="image/x-icon" href="{{site.icon}}">
+    {% endif %}
+    <link href="{{ url_for('static', filename='lib/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='lib/highlight.js/github.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='lib/mermaid/mermaid.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed"
+                        data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">{{ site.nav if site.nav else site.title  }}</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/">{{ t('navbar.home') }}</a></li>
+                    <li><a href="/posts">{{ t('navbar.all_articles') }}</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+{% if footer and footer.enabled %}
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="container">
+
+        {% if footer.copyright.enabled %}
+        <p class="copyright">
+          &copy; {{ site_year_text }} {{ footer.copyright.owner_name }}
+          {% if footer.copyright.license %}
+            · <a href="{{ footer.copyright.license.url }}" target="_blank" rel="noopener">
+              {{ footer.copyright.license.name }}
+            </a>
+          {% endif %}
+        </p>
+        {% endif %}
+
+        {% if footer.nav_links %}
+        <ul class="footer-links list-inline">
+          {% for link in footer.nav_links %}
+            <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+   <div class="footer-legal">
+     {% for legal in footer.legals %}
+       {% if legal.enabled and legal.value %}
+         <a href="{{ legal.url }}" target="_blank" rel="noopener">
+           {% if legal.icon %}
+             <img class="mps-icon" src="{{ legal.icon }}" alt="{{ legal.name }}">
+           {% endif %}
+           {{ legal.value }}
+         </a>
+       {% endif %}
+     {% endfor %}
+   </div>
+
+      </div>
+    </footer>
+{% endif %}
+</body>
+<script src="{{ url_for('static', filename='lib/jquery/jquery-2.2.4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/bootstrap/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/mermaid/mermaid.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/mathjax-2.6.1/MathJax.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/highlight.js/highlight.min.js') }}"></script>
+<script>
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    config: ["MMLorHTML.js"],
+    jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
+    extensions: ["tex2jax.js", "MathMenu.js", "MathZoom.js"],
+    TeX: {
+        extensions: ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
+    },
+    "HTML-CSS": {
+        availableFonts: ["TeX"],
+        preferredFont: "TeX",
+        webFont: "TeX",
+        imageFont: "TeX",
+        scale: 100,
+        linebreaks: { automatic: true, width: "container" }
+    },
+    NativeMML: {
+        scale: 100,
+        linebreaks: { automatic: true }
+    }
+});
+</script>
+<script>
+$(function () {
+  var mermaidBlocks = [];
+  $("pre > code.language-mermaid").each(function () {
+    var rawHtml = $(this).html();
+    var decoded = $("<textarea>").html(rawHtml).val();
+    var $div = $("<div></div>").addClass("mermaid").text(decoded);
+    mermaidBlocks.push({ old: $(this).parent(), new: $div });
+  });
+  for (var i = 0; i < mermaidBlocks.length; i++) {
+    mermaidBlocks[i].old.replaceWith(mermaidBlocks[i].new);
+  }
+
+  $("pre > code").each(function () {
+    var cls = $(this).attr("class") || "";
+    if (cls.indexOf("language-mermaid") === -1) {
+      hljs.highlightBlock(this);
+    }
+  });
+
+  if (typeof mermaid !== "undefined") {
+    mermaid.initialize({ startOnLoad: false });
+    mermaid.init(undefined, ".mermaid");
+  }
+});
+</script>
+</html>
