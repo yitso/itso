@@ -45,12 +45,33 @@
 
         {% if footer.copyright.enabled %}
         <p class="copyright">
-          &copy; {{ site_year_text }} {{ footer.copyright.owner_name }}
-          {% if footer.copyright.license %}
-            · <a href="{{ footer.copyright.license.url }}" target="_blank" rel="noopener">
-              {{ footer.copyright.license.name }}
-            </a>
-          {% endif %}
+          &copy; {{ site_year_text }}
+            {% if footer.copyright.url %}
+              <a href="{{ footer.copyright.url }}" target="_blank" rel="noopener">{{ footer.copyright.owner_name }}</a>
+            {% else %}
+              {{ footer.copyright.owner_name }}
+            {% endif %}
+            {% if footer.copyright.notice %}
+              <span class="separator">{{ footer.copyright.notice.separator or '·' }}</span>
+              {% if footer.copyright.notice.mode == "plain" and footer.copyright.notice.plain.text %}
+                {{ footer.copyright.notice.plain.text }}
+
+              {% elif footer.copyright.notice.mode == "license" %}
+                {% if footer.copyright.notice.license.prefix %}
+                  {{ footer.copyright.notice.license.prefix }}
+                {% endif %}
+                {% if footer.copyright.notice.license.url %}
+                  <a href="{{ footer.copyright.notice.license.url }}" target="_blank" rel="noopener">
+                    {{ footer.copyright.notice.license.name }}
+                  </a>
+                {% else %}
+                  {{ footer.copyright.notice.license.name }}
+                {% endif %}
+
+              {% elif footer.copyright.notice.mode == "custom" and footer.copyright.notice.custom.html %}
+                {{ footer.copyright.notice.custom.html | safe }}
+              {% endif %}
+            {% endif %}
         </p>
         {% endif %}
 

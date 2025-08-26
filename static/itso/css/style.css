@@ -58,7 +58,6 @@ body {
   text-decoration: underline;
 }
 
-
 /* 文章样式 */
 .post-preview {
     margin-bottom: 40px;
@@ -311,6 +310,9 @@ body {
   text-align: center;
 }
 
+.site-footer .separator {
+  margin: 0 0.25;
+}
 
 .footer-legal {
   display: flex;
