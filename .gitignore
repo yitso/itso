@@ -25,3 +25,6 @@ hs_err_pid*
 .DS_Store
 configs/*
 !configs/example.json
+
+node_modules
+static/itso/dist

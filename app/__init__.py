@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from pathlib import Path
 from datetime import datetime
 
@@ -10,6 +9,7 @@ from app.config import get_config
 from app.i18n import load_translations, make_translator
 from app.routes import register_routes
 from app.services.content import get_site_config
+from app.build import vite_manifest
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
@@ -50,7 +50,6 @@ def create_app():
             site_year_text=year_text,
         )
 
-
     @app.context_processor
     def inject_translations():
         site_cfg = get_site_config()
@@ -60,10 +59,13 @@ def create_app():
         lang = site_cfg.get("lang", 'en')
         return dict(t=t, lang=lang)
 
+    @app.context_processor
+    def inject_vite_assets():
+        return dict(vite_dist_path=cfg.VITE_DIST_PATH, vite_manifest= vite_manifest(cfg.VITE_DIST_PATH))
+
     @app.template_filter()
     def date_i18n(value, fmt="long"):
         site_cfg = get_site_config()
-
         return format_date(value, format=fmt, locale=site_cfg.get("date_locale", "en"))
 
     register_routes(app)

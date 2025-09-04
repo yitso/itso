@@ -7,10 +7,10 @@
     {% if site.icon %}
     <link rel="shortcut icon" type="image/x-icon" href="{{site.icon}}">
     {% endif %}
-    <link href="{{ url_for('static', filename='itso/lib/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='itso/lib/highlight.js/github.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='itso/lib/mermaid/mermaid.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='itso/css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='itso/dist/lib/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    {% for css in vite_manifest['frontend/main.js'].get('css', []) %}
+    <link rel="stylesheet" href="{{ '/' ~ vite_dist_path ~ '/' ~ css }}">
+    {% endfor %}
 </head>
 <body>
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -100,11 +100,9 @@
     </footer>
 {% endif %}
 </body>
-<script src="{{ url_for('static', filename='itso/lib/jquery/jquery-2.2.4.min.js') }}"></script>
-<script src="{{ url_for('static', filename='itso/lib/bootstrap/bootstrap.min.js') }}"></script>
-<script src="{{ url_for('static', filename='itso/lib/mermaid/mermaid.min.js') }}"></script>
-<script src="{{ url_for('static', filename='itso/lib/mathjax-2.6.1/MathJax.js') }}"></script>
-<script src="{{ url_for('static', filename='itso/lib/highlight.js/highlight.min.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/dist/lib/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/dist/lib/bootstrap/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='itso/dist/lib/mathjax/MathJax.js') }}"></script>
 <script>
     MathJax.Hub.Config({
     tex2jax: {
@@ -133,30 +131,5 @@
     }
 });
 </script>
-<script>
-$(function () {
-  var mermaidBlocks = [];
-  $("pre > code.language-mermaid").each(function () {
-    var rawHtml = $(this).html();
-    var decoded = $("<textarea>").html(rawHtml).val();
-    var $div = $("<div></div>").addClass("mermaid").text(decoded);
-    mermaidBlocks.push({ old: $(this).parent(), new: $div });
-  });
-  for (var i = 0; i < mermaidBlocks.length; i++) {
-    mermaidBlocks[i].old.replaceWith(mermaidBlocks[i].new);
-  }
-
-  $("pre > code").each(function () {
-    var cls = $(this).attr("class") || "";
-    if (cls.indexOf("language-mermaid") === -1) {
-      hljs.highlightBlock(this);
-    }
-  });
-
-  if (typeof mermaid !== "undefined") {
-    mermaid.initialize({ startOnLoad: false });
-    mermaid.init(undefined, ".mermaid");
-  }
-});
-</script>
+<script type="module" src="{{ '/' ~ vite_dist_path ~ '/' ~ vite_manifest['frontend/main.js']['file'] }}"></script>
 </html>

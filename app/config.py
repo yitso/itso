@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 @dataclass
 class BaseConfig:
+    VITE_DIST_PATH: str = "static/itso/dist"
     SITE_CONFIG_PATH: str = "configs/example.json"
     HOST: str = "127.0.0.1"
     PORT: int = 8000
