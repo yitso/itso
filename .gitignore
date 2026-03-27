@@ -28,3 +28,4 @@ configs/*
 
 node_modules
 static/itso/dist
+dist/

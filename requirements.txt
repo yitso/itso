@@ -2,3 +2,4 @@ Flask
 Markdown
 babel
 gevent
+PyYAML

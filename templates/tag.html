@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('page.tag.title') }}: {{ display_tag }}{% endblock %}
+
+{% block og_meta %}
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ t('page.tag.title') }}: {{ display_tag }}">
+{% endblock %}
+
+{% block canonical_link %}
+{% set _url = canonical_url(tag_url(display_tag)) %}
+{% if _url %}<link rel="canonical" href="{{ _url }}">{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    <h1 class="page-header">
+      <a href="{{ page_url('/tags/') }}">{{ t('page.tags.heading') }}</a>
+      <span class="separator">›</span>
+      {{ display_tag }}
+    </h1>
+
+    {% for article in articles %}
+    <article class="post-item">
+      <h2 class="post-title">
+        <a href="{{ article_url(article.id) }}">{{ article.title or t('article.untitled') }}</a>
+      </h2>
+      <div class="post-meta">
+        <span class="text-muted">{{ article.date|date_i18n }}</span>
+        {% if article.tags %}
+        <span class="post-tags">
+          {% for atag in article.tags %}
+          <a class="tag-badge{% if atag == display_tag %} tag-badge-active{% endif %}" href="{{ tag_url(atag) }}">{{ atag }}</a>
+          {% endfor %}
+        </span>
+        {% endif %}
+      </div>
+      {% if article.summary %}
+      <div class="post-excerpt">{{ article.summary|safe }}</div>
+      {% endif %}
+    </article>
+    {% if not loop.last %}<hr class="post-divider">{% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

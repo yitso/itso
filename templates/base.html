@@ -4,38 +4,211 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %} ｜ {{ site.title }}</title>
+    <script>
+      (function () {
+        var STORAGE_KEY = 'itso-color-mode';
+        var root = document.documentElement;
+
+        function systemMode() {
+          return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function getPreference() {
+          var stored = null;
+          try {
+            stored = localStorage.getItem(STORAGE_KEY);
+          } catch (err) {
+            stored = null;
+          }
+          return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+        }
+
+        function applyMode(preference) {
+          var effective = preference === 'system' ? systemMode() : preference;
+          root.setAttribute('data-color-preference', preference);
+          root.setAttribute('data-color-mode', effective);
+        }
+
+        applyMode(getPreference());
+      })();
+    </script>
     {% if site.icon %}
-    <link rel="shortcut icon" type="image/x-icon" href="{{site.icon}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ site_url(site.icon) }}">
     {% endif %}
-    <link href="{{ url_for('static', filename='itso/dist/lib/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset_url('itso/dist/lib/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
     {% for css in vite_manifest['frontend/main.js'].get('css', []) %}
-    <link rel="stylesheet" href="{{ '/' ~ vite_dist_path ~ '/' ~ css }}">
+    <link rel="stylesheet" href="{{ site_url('/' ~ vite_dist_path ~ '/' ~ css) }}">
     {% endfor %}
+    {% if theme and theme.css_path %}
+    <link rel="stylesheet" href="{{ site_url(theme.css_path) }}">
+    {% endif %}
+    {% if theme and theme.tokens %}
+    <style id="theme-tokens">
+      :root {
+      {% for token_name, token_value in theme.tokens.items() %}
+        --{{ token_name }}: {{ token_value }};
+      {% endfor %}
+      }
+      {% if theme.modes and 'light' in theme.modes %}
+      :root[data-color-mode="light"] {
+      {% for token_name, token_value in theme.modes.light.items() %}
+        --{{ token_name }}: {{ token_value }};
+      {% endfor %}
+      }
+      {% endif %}
+      {% if theme.modes and 'dark' in theme.modes %}
+      :root[data-color-mode="dark"] {
+      {% for token_name, token_value in theme.modes.dark.items() %}
+        --{{ token_name }}: {{ token_value }};
+      {% endfor %}
+      }
+      {% endif %}
+    </style>
+    {% endif %}
+    <style>
+    @media (max-width: 767px) {
+      .navbar-fixed-top {
+        overflow: visible;
+      }
+
+      .navbar-fixed-top .nav-shell {
+        display: block;
+        padding: 0;
+      }
+
+      .navbar-fixed-top .navbar-header {
+        display: flex !important;
+        align-items: center;
+        padding: 0 16px;
+        min-height: 66px;
+        width: 100%;
+        box-sizing: border-box;
+        float: none !important;
+        margin: 0 !important;
+      }
+
+      .navbar-fixed-top .navbar-brand {
+        position: static !important;
+        float: none !important;
+        margin: 0 !important;
+        padding: 0;
+        height: auto;
+        line-height: 1;
+        font-size: 22px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .navbar-fixed-top .navbar-toggle {
+        float: none !important;
+        margin: 0 !important;
+        border: 0;
+        padding: 6px 4px;
+        display: block;
+      }
+
+      .navbar-header-controls {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .navbar-fixed-top .navbar-toggle .icon-bar {
+        display: block;
+      }
+
+      .navbar-fixed-top .navbar-toggle .icon-bar + .icon-bar {
+        margin-top: 4px;
+      }
+
+      .navbar-fixed-top .navbar-collapse {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 16px;
+        left: auto;
+        width: 190px;
+        max-width: calc(100vw - 32px);
+        background: var(--mobile-nav-bg);
+        border: 1px solid var(--mobile-nav-border);
+        border-radius: 12px;
+        box-shadow: var(--mobile-nav-shadow);
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        z-index: 999;
+      }
+
+      .navbar-fixed-top .navbar-nav {
+        float: none !important;
+        margin: 0;
+      }
+
+      .navbar-fixed-top .navbar-nav > li {
+        float: none;
+      }
+
+      .navbar-fixed-top .navbar-nav > li > a {
+        margin: 0;
+        border-radius: 0;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--mobile-nav-item-border);
+      }
+
+      .navbar-fixed-top .navbar-nav > li:last-child > a {
+        border-bottom: 0;
+      }
+    }
+    </style>
+    {# --- SEO --- #}
+    {% block seo_description %}{% if site.description %}<meta name="description" content="{{ site.description }}">{% endif %}{% endblock %}
+    <meta property="og:site_name" content="{{ site.title }}">
+    {% block og_meta %}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ site.title }}">
+    {% endblock %}
+    <meta name="twitter:card" content="summary">
+    {% block canonical_link %}{% endblock %}
 </head>
-<body>
+<body data-theme="{{ theme.id if theme else 'default' }}">
+    <div class="site-bg"></div>
+    <div class="site-noise"></div>
     <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
+      <div class="container-fluid nav-shell">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed"
-                        data-toggle="collapse" data-target="#navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="/">{{ site.nav if site.nav else site.title  }}</a>
+                <a class="navbar-brand" href="{{ home_url }}">{{ site.nav if site.nav else site.title }}</a>
+                <div class="navbar-header-controls">
+                  <div class="nav-mode-item">
+                    <button type="button" id="color-mode-toggle" class="nav-mode-toggle" aria-label="Toggle color mode" aria-haspopup="true" aria-expanded="false">
+                      <span class="mode-icon" aria-hidden="true"></span>
+                    </button>
+                    <div class="mode-menu" id="mode-menu" role="menu">
+                      <button class="mode-option" data-mode="system" role="menuitem">Auto</button>
+                      <button class="mode-option" data-mode="light" role="menuitem">Light</button>
+                      <button class="mode-option" data-mode="dark" role="menuitem">Dark</button>
+                    </div>
+                  </div>
+                  <button type="button" class="navbar-toggle collapsed"
+                          data-toggle="collapse" data-target="#navbar-collapse">
+                      <span class="sr-only">{{ t('navbar.toggle_navigation') }}</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                  </button>
+                </div>
             </div>
 
             <div class="collapse navbar-collapse" id="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/">{{ t('navbar.home') }}</a></li>
-                    <li><a href="/posts">{{ t('navbar.all_articles') }}</a></li>
+                  <li><a href="{{ home_url }}">{{ t('navbar.home') }}</a></li>
+                  <li><a href="{{ posts_url }}">{{ t('navbar.all_articles') }}</a></li>
+                  <li><a href="{{ page_url('/tags/') }}">{{ t('navbar.tags') }}</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container">
+          <div class="container main-shell">
         {% block content %}{% endblock %}
     </div>
 {% if footer and footer.enabled %}
@@ -78,7 +251,7 @@
         {% if footer.nav_links %}
         <ul class="footer-links list-inline">
           {% for link in footer.nav_links %}
-            <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+            <li><a href="{{ page_url(link.url) }}">{{ link.label }}</a></li>
           {% endfor %}
         </ul>
         {% endif %}
@@ -88,7 +261,7 @@
        {% if legal.enabled and legal.value %}
          <a href="{{ legal.url }}" target="_blank" rel="noopener">
            {% if legal.icon %}
-             <img class="mps-icon" src="{{ legal.icon }}" alt="{{ legal.name }}">
+             <img class="mps-icon" src="{{ site_url(legal.icon) }}" alt="{{ legal.name }}">
            {% endif %}
            {{ legal.value }}
          </a>
@@ -100,9 +273,9 @@
     </footer>
 {% endif %}
 </body>
-<script src="{{ url_for('static', filename='itso/dist/lib/jquery/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='itso/dist/lib/bootstrap/bootstrap.min.js') }}"></script>
-<script src="{{ url_for('static', filename='itso/dist/lib/mathjax/MathJax.js') }}"></script>
+<script src="{{ asset_url('itso/dist/lib/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset_url('itso/dist/lib/bootstrap/bootstrap.min.js') }}"></script>
+<script src="{{ asset_url('itso/dist/lib/mathjax/MathJax.js') }}"></script>
 <script>
     MathJax.Hub.Config({
     tex2jax: {
@@ -131,5 +304,5 @@
     }
 });
 </script>
-<script type="module" src="{{ '/' ~ vite_dist_path ~ '/' ~ vite_manifest['frontend/main.js']['file'] }}"></script>
+<script type="module" src="{{ site_url('/' ~ vite_dist_path ~ '/' ~ vite_manifest['frontend/main.js']['file']) }}"></script>
 </html>

@@ -1,21 +1,91 @@
 {% extends "base.html" %}
 
-{% block title %}{{ article.title }}{% endblock %}
+{% block title %}{{ article.title or t('article.untitled') }}{% endblock %}
+
+{% block seo_description %}<meta name="description" content="{{ article.summary | truncate(160, killwords=True, end='...') }}">{% endblock %}
+
+{% block og_meta %}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ article.title or t('article.untitled') }}">
+{% if article.summary %}<meta property="og:description" content="{{ article.summary | truncate(200, killwords=True, end='...') }}">{% endif %}
+{% set _canonical = canonical_url(article_url(article.id)) %}
+{% if _canonical %}<meta property="og:url" content="{{ _canonical }}">{% endif %}
+<meta name="twitter:title" content="{{ article.title or t('article.untitled') }}">
+{% if article.summary %}<meta name="twitter:description" content="{{ article.summary | truncate(200, killwords=True, end='...') }}">{% endif %}
+{% endblock %}
+
+{% block canonical_link %}
+{% set _canonical = canonical_url(article_url(article.id)) %}
+{% if _canonical %}<link rel="canonical" href="{{ _canonical }}">{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
         <article class="post-detail">
+            <div class="post-header-top">
+                <a class="post-back" href="{{ posts_url }}">{{ t('navbar.all_articles') }}</a>
+            </div>
             <header class="post-header">
-                <h1 class="post-title">{{ article.title }}</h1>
+                <h1 class="post-title">{{ article.title or t('article.untitled') }}</h1>
                 <div class="post-meta">
                     <time class="text-muted">{{ article.date|date_i18n }}</time>
+          {% if article.tags %}
+          <span class="post-tags">
+            {% for tag in article.tags %}
+            <a class="tag-badge" href="{{ tag_url(tag) }}">{{ tag }}</a>
+            {% endfor %}
+          </span>
+          {% endif %}
                 </div>
             </header>
-
             <div class="post-content">
                 {{ article.content|safe }}
             </div>
+
+            {% if article.promo and (article.promo.mirror.url or article.promo.social_links or article.promo.cta.url) %}
+            <section class="post-promo" aria-label="{{ t('article.promo_links_aria') }}">
+                {% if article.promo.mirror.url %}
+                <div class="promo-block promo-mirror">
+                    <h3>{{ t('article.read_elsewhere') }}</h3>
+                    <a class="promo-pill" href="{{ article.promo.mirror.url }}" target="_blank" rel="noopener noreferrer">
+                        {{ article.promo.mirror.label or article.promo.mirror.platform or t('article.read_external') }}
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if article.promo.social_links %}
+                <div class="promo-block promo-socials">
+                    <h3>{{ t('article.connect') }}</h3>
+                    <div class="promo-links-wrap">
+                        {% for item in article.promo.social_links %}
+                        <a class="promo-pill" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">
+                            {{ item.label or item.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if article.promo.cta.url %}
+                <div class="promo-block promo-cta">
+                    {% if article.promo.cta.title %}
+                    <h3>{{ article.promo.cta.title }}</h3>
+                    {% else %}
+                    <h3>{{ t('article.keep_in_touch') }}</h3>
+                    {% endif %}
+
+                    {% if article.promo.cta.text %}
+                    <p>{{ article.promo.cta.text }}</p>
+                    {% endif %}
+
+                    <a class="promo-pill promo-pill-primary" href="{{ article.promo.cta.url }}" target="_blank" rel="noopener noreferrer">
+                        {{ article.promo.cta.label or t('article.learn_more') }}
+                    </a>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
         </article>
     </div>
 </div>

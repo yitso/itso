@@ -2,10 +2,13 @@ import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 
+const viteBase = process.env.VITE_BASE || '/static/itso/dist/'
+const normalizedViteBase = viteBase.endsWith('/') ? viteBase : `${viteBase}/`
+
 export default defineConfig({
   root: '.',
   publicDir: false,
-  base: '/static/itso/dist/',
+  base: normalizedViteBase,
   optimizeDeps: {
     include: ['mermaid']
   },

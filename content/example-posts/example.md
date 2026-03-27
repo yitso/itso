@@ -1,27 +1,48 @@
 ---
-title: Hello World!
+id: welcome-itso
+title: Hello World
 date: 2017-01-24
-summary: Welcome to my blog! 
+summary: Welcome to the Itso example site. This post validates the default rendering pipeline.
+cover:
+  src: /static/itso/img/IMG_3233.jpg
+  alt: Example post cover image
+tags:
+  - intro
+  - example
+mirror:
+  platform: Medium
+  url: https://medium.com/@your-name/your-post
+  label: Read on Medium
+social_links:
+  - name: X
+    url: https://x.com/your-handle
+    label: Follow on X
+  - name: Facebook
+    url: https://facebook.com/your-page
+    label: Join on Facebook
+call_to_action:
+  title: More Thoughts and Discussion
+  text: If you enjoy this topic, follow and message me on social platforms.
+  label: Follow My Medium
+  url: https://medium.com/@your-name
 ---
 
->Welcome to my blog!
+> Welcome to my blog.
 
----
+## Test Content
 
-# Test Content
+### Image
 
-## Image
+![City](/static/itso/img/IMG_3233.jpg)
 
-![Profile](/static/itso/img/profile.jpeg)
-
-## Code Block
+### Code Block
 
 ```python
 if __name__ == "__main__":
-    print("Hello World!")
+    print("Hello World")
 ```
-## Formula
-**Probability Density Function of the Normal Distribution**
+
+### Formula
 
 $$
 f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x - \mu)^2}{2\sigma^2}\right)
@@ -29,19 +50,11 @@ $$
 
 Where:
 
-- $ \mu $ is the mean (expected value)  
-- $ \sigma $ is the standard deviation  
-- $ \sigma^2 $ is the variance  
+- $\mu$ is the mean
+- $\sigma$ is the standard deviation
+- $\sigma^2$ is the variance
 
-**Matrix**
-
-$$\begin{bmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0 \\
-0 & 0 & 1 \\
-\end{bmatrix}$$
-
-## Table
+### Table
 
 | X | Y | Z  |
 |:--|--:|:--:|
@@ -50,7 +63,7 @@ $$\begin{bmatrix}
 | 1 | 0 | +1 |
 | 1 | 1 | -1 |
 
-## Mermaid
+### Mermaid
 
 ```mermaid
 graph TD

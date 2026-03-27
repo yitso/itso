@@ -2,7 +2,13 @@
   "lang": "en",
   "date_locale": "en",
   "i18n_file": "i18n/en.json",
+  "theme": {
+    "id": "default"
+  },
   "posts": "content/example-posts",
+  "pinned_post_ids": [
+    "welcome-itso"
+  ],
   "site": {
     "title": "Itso Example",
     "nav": "Itso",
