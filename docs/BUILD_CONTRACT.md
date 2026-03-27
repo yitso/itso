@@ -71,7 +71,7 @@ Output directory contains:
 
 - `index.html`
 - `posts/index.html`
-- `posts/<slug>/index.html`
+- `posts/<id>/index.html`
 - `tags/index.html`
 - `tags/<slug>/index.html`
 - `404.html`
