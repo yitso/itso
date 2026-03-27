@@ -23,7 +23,6 @@ def register_routes(app):
         articles = load_article_metadata()
         return render_template("list.html", articles=articles)
 
-    @app.route("/posts/<path:article_ref>", strict_slashes=False)
     @app.route("/posts/<path:article_ref>/", strict_slashes=False)
     def article_detail(article_ref):
         try:

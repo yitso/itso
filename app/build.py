@@ -119,7 +119,7 @@ def _write_build_manifest(site_dir: Path, cfg, article_count: int):
 def build_static_site(cfg, skip_assets: bool = False):
     from app import create_app
     from app.services.content import (
-        load_article_content,
+        load_article_content_by_slug,
         load_article_metadata,
         get_all_tags,
         get_articles_by_tag,
@@ -158,7 +158,10 @@ def build_static_site(cfg, skip_assets: bool = False):
         )
 
         for item in articles:
-            article = load_article_content(item["id"])
+            article = load_article_content_by_slug(item["slug"])
+            if article is None:
+                print(f"[site] warning: could not load content for article id={item['id']} slug={item['slug']}, skipping")
+                continue
             _write_html(
                 site_dir,
                 f"posts/{item['id']}/index.html",

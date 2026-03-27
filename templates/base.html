@@ -179,13 +179,13 @@
                 <a class="navbar-brand" href="{{ home_url }}">{{ site.nav if site.nav else site.title }}</a>
                 <div class="navbar-header-controls">
                   <div class="nav-mode-item">
-                    <button type="button" id="color-mode-toggle" class="nav-mode-toggle" aria-label="Toggle color mode" aria-haspopup="true" aria-expanded="false">
+                    <button type="button" id="color-mode-toggle" class="nav-mode-toggle" aria-label="{{ t('navbar.toggle_color_mode') }}" aria-haspopup="true" aria-expanded="false">
                       <span class="mode-icon" aria-hidden="true"></span>
                     </button>
                     <div class="mode-menu" id="mode-menu" role="menu">
-                      <button class="mode-option" data-mode="system" role="menuitem">Auto</button>
-                      <button class="mode-option" data-mode="light" role="menuitem">Light</button>
-                      <button class="mode-option" data-mode="dark" role="menuitem">Dark</button>
+                      <button class="mode-option" data-mode="system" role="menuitem">{{ t('navbar.color_mode_auto') }}</button>
+                      <button class="mode-option" data-mode="light" role="menuitem">{{ t('navbar.color_mode_light') }}</button>
+                      <button class="mode-option" data-mode="dark" role="menuitem">{{ t('navbar.color_mode_dark') }}</button>
                     </div>
                   </div>
                   <button type="button" class="navbar-toggle collapsed"

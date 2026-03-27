@@ -51,7 +51,16 @@ def _normalize_tags(value) -> List[str]:
 
 
 def slugify_tag(tag: str) -> str:
-    return re.sub(r"\s+", "-", tag.strip().lower())
+    """
+    Convert a tag string into a URL-safe slug suitable for ``/tags/<tag>`` routes.
+
+    Lowercases the input, replaces any run of non-alphanumeric characters
+    (including whitespace and ``/``) with a single ``-``, and trims leading /
+    trailing dashes.
+    """
+    slug = tag.strip().lower()
+    slug = re.sub(r"[^a-z0-9]+", "-", slug)
+    return slug.strip("-")
 
 
 def _normalize_link_items(value) -> List[dict]:
@@ -62,14 +71,14 @@ def _normalize_link_items(value) -> List[dict]:
     for item in value:
         if not isinstance(item, dict):
             continue
-        url = (item.get("url") or "").strip()
+        url = str(item.get("url") or "").strip()
         if not url:
             continue
         normalized.append(
             {
-                "name": (item.get("name") or item.get("platform") or "Link").strip(),
+                "name": str(item.get("name") or item.get("platform") or "Link").strip(),
                 "url": url,
-                "label": (item.get("label") or "").strip(),
+                "label": str(item.get("label") or "").strip(),
             }
         )
     return normalized
