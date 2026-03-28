@@ -96,14 +96,23 @@ def create_app():
         def canonical_url(path: str = "") -> str:
             if not _canonical_base:
                 return ""
-            # Absolute URLs are returned as-is (no site_url prefix needed).
+            # Absolute URLs are returned as-is.
             if path.startswith(("http://", "https://")):
                 return path
-            # Avoid double-applying SITE_BASE when path is already site-relative.
-            site_base = app.config["SITE_BASE"]
-            if site_base and site_base != "/" and path.startswith(site_base):
-                return _canonical_base + path
-            return _canonical_base + site_url(path)
+            # Treat empty path as site root.
+            if not path:
+                path = "/"
+            # Ensure path starts with a leading slash for normalization.
+            if not path.startswith("/"):
+                path = "/" + path
+            # Normalize by stripping any leading SITE_BASE so we don't double-apply it.
+            site_base = (app.config.get("SITE_BASE") or "").rstrip("/")
+            if site_base and site_base != "/":
+                if path == site_base:
+                    path = "/"
+                elif path.startswith(site_base + "/"):
+                    path = path[len(site_base):]
+            return _canonical_base + path
 
         def tag_url(tag: str) -> str:
             return page_url(f"/tags/{slugify_tag(tag)}/")

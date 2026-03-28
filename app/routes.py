@@ -64,8 +64,10 @@ def register_routes(app):
     @app.route("/robots.txt")
     def robots_txt():
         site_cfg = get_site_config()
-        base_url = (site_cfg.get("base_url") or "").rstrip("/")
+        base_url = (site_cfg.get("base_url") or "").strip()
+        if not base_url:
+            abort(404)
+        base_url = base_url.rstrip("/")
         content = "User-agent: *\nAllow: /\n"
-        if base_url:
-            content += f"Sitemap: {base_url}/sitemap.xml\n"
+        content += f"Sitemap: {base_url}/sitemap.xml\n"
         return Response(content, mimetype="text/plain")

@@ -21,7 +21,10 @@ MATH_PATTERN = re.compile(r"(?<!\\)(\${1,2})(.*?)(?<!\\)\1", re.DOTALL)
 
 
 def _parse_metadata_block(metadata_str: str) -> Dict[str, str]:
-    loaded = yaml.safe_load(metadata_str) or {}
+    try:
+        loaded = yaml.safe_load(metadata_str) or {}
+    except yaml.YAMLError as exc:
+        raise ValueError(f"Invalid YAML in metadata block: {exc}") from exc
     if not isinstance(loaded, dict):
         return {}
     return {str(k).strip().lower(): v for k, v in loaded.items()}
@@ -392,30 +395,66 @@ def _load_article_content_from_file(filepath: str, slug: str) -> dict:
         }
 
 
+def _build_article_index() -> Dict[str, Dict[str, str]]:
+    """
+    Build an in-memory index mapping normalized article IDs to filepaths and slugs.
+
+    This performs a single pass over all article files and parses only the metadata
+    block to extract the article ID, avoiding repeated full-content reads on each
+    article lookup.
+    """
+    index: Dict[str, Dict[str, str]] = {}
+
+    for item in _iter_article_files():
+        filepath = item["filepath"]
+        slug = item["slug"]
+
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                parts = f.read().split(META_SPLIT, 2)
+        except OSError:
+            continue
+
+        if len(parts) < 3:
+            continue
+
+        metadata = _parse_metadata_block(parts[1].strip())
+        raw_id = metadata.get("id")
+        if not raw_id:
+            continue
+
+        try:
+            article_id = _normalize_article_id(str(raw_id))
+        except ValueError:
+            continue
+
+        if article_id not in index:
+            index[article_id] = {"filepath": filepath, "slug": slug}
+
+    return index
+
+
 def load_article_content(article_id: str) -> dict:
     try:
         normalized_id = _normalize_article_id(article_id)
     except ValueError:
         abort(404)
 
-    for item in _iter_article_files():
-        with open(item["filepath"], "r", encoding="utf-8") as f:
-            parts = f.read().split(META_SPLIT, 2)
-            if len(parts) < 3:
-                continue
-            metadata = _parse_metadata_block(parts[1].strip())
-            raw_id = metadata.get("id")
-            if not raw_id:
-                continue
-            try:
-                current_id = _normalize_article_id(str(raw_id))
-            except ValueError:
-                continue
+    # Lazily build and cache the article index so lookups are O(1) and we
+    # avoid rescanning all article files on each request.
+    index = current_app.config.get("ARTICLE_INDEX")
+    if not isinstance(index, dict):
+        index = _build_article_index()
+        current_app.config["ARTICLE_INDEX"] = index
 
-            if current_id == normalized_id:
-                return _load_article_content_from_file(item["filepath"], item["slug"])
+    article_info = index.get(normalized_id)
+    if not article_info:
+        abort(404)
 
-    abort(404)
+    return _load_article_content_from_file(
+        article_info["filepath"],
+        article_info["slug"],
+    )
 
 
 def load_article_content_by_slug(slug: str) -> Optional[dict]:
