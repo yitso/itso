@@ -31,7 +31,7 @@ def _parse_cli_args(argv=None) -> dict:
     if argv is None:
         argv = sys.argv[1:]
 
-    parser = argparse.ArgumentParser(add_help=False)
+    parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
     parser.add_argument("--lang", dest="LANG")
     parser.add_argument("--site-config", dest="SITE_CONFIG_PATH")
     parser.add_argument("--themes-dir", dest="THEMES_DIR")

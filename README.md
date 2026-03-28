@@ -70,7 +70,7 @@ Theme selection is configuration-driven and fixed at build/runtime startup.
 
 ```json
 "theme": {
-	"id": "minimal-tech"
+	"id": "default"
 }
 ```
 
@@ -83,7 +83,7 @@ Optional token overrides can be added per site config:
 
 ```json
 "theme": {
-	"id": "minimal-tech",
+	"id": "default",
 	"overrides": {
 		"accent": "#7cf6cf"
 	}
