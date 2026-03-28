@@ -92,6 +92,9 @@ Optional token overrides can be added per site config:
 
 ## GitHub Pages (Project Site)
 
+> **Live Example:** This repository itself is deployed as a live example site.  
+> 👉 [https://yitso.github.io/itso/](https://yitso.github.io/itso/)
+
 For a repository site, set site base to `/<repo>/`.
 
 One-off local test:

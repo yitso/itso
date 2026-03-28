@@ -75,6 +75,7 @@ def create_app():
         site = site_cfg.get("site", {}) or {}
         profile = site_cfg.get("profile", {}) or {}
         footer = site_cfg.get("footer", {}) or {}
+        announcement = site_cfg.get("announcement", {}) or {}
 
         # Footer extra (handled in template: pass already-processed html if you want)
         extra_cfg = footer.get("extra", {}) or {}
@@ -122,6 +123,7 @@ def create_app():
             theme=theme,
             profile=profile,
             footer=footer,
+            announcement=announcement,
             footer_extra_html=footer_extra_html,
             site_year_text=year_text,
             site_url=site_url,

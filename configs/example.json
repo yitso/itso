@@ -30,7 +30,15 @@
       {"name": "LinkedIn", "show": false}
     ]
   },
-    "footer": {
+  "announcement": {
+    "enabled": true,
+    "text": "This is an example site built with Itso.",
+    "link": {
+      "label": "View source on GitHub",
+      "url": "https://github.com/yitso/itso"
+    }
+  },
+  "footer": {
       "enabled": true,
       "copyright": {
         "enabled": true,

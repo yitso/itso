@@ -47,7 +47,11 @@
     "mobile-nav-bg": "rgba(11, 16, 23, 0.97)",
     "mobile-nav-border": "rgba(206, 215, 224, 0.28)",
     "mobile-nav-shadow": "0 10px 30px rgba(0, 0, 0, 0.55)",
-    "mobile-nav-item-border": "rgba(157, 168, 182, 0.26)"
+    "mobile-nav-item-border": "rgba(157, 168, 182, 0.26)",
+    "announcement-bg": "rgba(13, 19, 27, 0.82)",
+    "announcement-text": "#a0a8b2",
+    "announcement-link": "#d7dde4",
+    "announcement-border": "rgba(160, 168, 178, 0.18)"
   },
   "modes": {
     "light": {
@@ -97,7 +101,11 @@
       "mobile-nav-bg": "rgba(249, 250, 252, 0.98)",
       "mobile-nav-border": "rgba(112, 127, 143, 0.24)",
       "mobile-nav-shadow": "0 10px 24px rgba(17, 23, 31, 0.15)",
-      "mobile-nav-item-border": "rgba(112, 127, 143, 0.2)"
+      "mobile-nav-item-border": "rgba(112, 127, 143, 0.2)",
+      "announcement-bg": "rgba(246, 248, 250, 0.88)",
+      "announcement-text": "#5c6570",
+      "announcement-link": "#3f4a57",
+      "announcement-border": "rgba(118, 132, 148, 0.2)"
     },
     "dark": {}
   }

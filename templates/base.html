@@ -79,6 +79,14 @@
 <body data-theme="{{ theme.id if theme else 'default' }}">
     <div class="site-bg"></div>
     <div class="site-noise"></div>
+    {% if announcement and announcement.enabled %}
+    <div class="site-announcement" role="note">
+      <span class="announcement-text">{{ announcement.text }}</span>
+      {% if announcement.link and announcement.link.url %}
+      <a class="announcement-link" href="{{ announcement.link.url }}" target="_blank" rel="noopener">{{ announcement.link.label }}</a>
+      {% endif %}
+    </div>
+    {% endif %}
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid nav-shell">
             <div class="navbar-header">
