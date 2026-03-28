@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}404{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <article class="post-detail text-center">
+            <header class="post-header">
+                <h1 class="post-title">404</h1>
+                <p class="post-meta">{{ t('page.404.not_found') }}</p>
+            </header>
+            <p>{{ t('navbar.home') }} / {{ t('navbar.all_articles') }}</p>
+            <p>
+                <a class="view-all-link" href="{{ home_url }}">{{ t('navbar.home') }}</a>
+                <a class="view-all-link" href="{{ posts_url }}">{{ t('navbar.all_articles') }}</a>
+            </p>
+        </article>
+    </div>
+</div>
+{% endblock %}

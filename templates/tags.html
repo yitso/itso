@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('page.tags.title') }}{% endblock %}
+
+{% block canonical_link %}
+{% set _url = canonical_url(page_url('/tags/')) %}
+{% if _url %}<link rel="canonical" href="{{ _url }}">{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    <h1 class="page-header">{{ t('page.tags.heading') }}</h1>
+
+    {% if tags %}
+    <div class="tags-cloud">
+      {% for tag_info in tags %}
+      <a class="tag-pill" href="{{ tag_url(tag_info.tag) }}">
+        {{ tag_info.tag }}
+        <span class="tag-count">{{ tag_info.count }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">{{ t('page.tags.empty') }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

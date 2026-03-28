@@ -1,0 +1,115 @@
+name: Build Site Engine
+
+on:
+  workflow_call:
+    inputs:
+      content_repo:
+        description: Content repository (owner/repo). Defaults to caller repo.
+        required: false
+        type: string
+        default: ""
+      content_ref:
+        description: Git ref for content repository.
+        required: false
+        type: string
+        default: "main"
+      site_config_path:
+        description: Path to site config file in content repository.
+        required: false
+        type: string
+        default: "configs/example.json"
+      site_base:
+        description: Site base path, e.g. /my-blog/
+        required: true
+        type: string
+      output_dir:
+        description: Build output directory relative to engine workspace.
+        required: false
+        type: string
+        default: "dist"
+      python_version:
+        description: Python version for build.
+        required: false
+        type: string
+        default: "3.11"
+      node_version:
+        description: Node version for build.
+        required: false
+        type: string
+        default: "20"
+    secrets:
+      content_repo_token:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve engine repo/ref
+        id: engine
+        shell: bash
+        run: |
+          workflow_ref="${{ github.workflow_ref }}"
+          engine_repo="${workflow_ref%%/.github/workflows/*}"
+          engine_ref="${workflow_ref##*@}"
+          echo "repo=${engine_repo}" >> "$GITHUB_OUTPUT"
+          echo "ref=${engine_ref}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout engine repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.engine.outputs.repo }}
+          ref: ${{ steps.engine.outputs.ref }}
+          path: engine
+
+      - name: Checkout content repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.content_repo != '' && inputs.content_repo || github.repository }}
+          ref: ${{ inputs.content_ref }}
+          token: ${{ secrets.content_repo_token || github.token }}
+          path: content
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+          cache-dependency-path: engine/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Install frontend dependencies
+        working-directory: engine
+        run: npm ci
+
+      - name: Install Python dependencies
+        working-directory: engine
+        run: pip install -r requirements.txt
+
+      - name: Build frontend assets
+        working-directory: engine
+        env:
+          VITE_BASE: ${{ inputs.site_base }}static/itso/dist/
+        run: npm run build:assets
+
+      - name: Build static pages from external content repo
+        working-directory: engine
+        env:
+          SITE_BASE: ${{ inputs.site_base }}
+          CONTENT_ROOT: ../content
+          STATIC_SITE_DIR: ${{ inputs.output_dir }}
+        run: |
+          python -m app.build --static --skip-assets --site-config "${{ inputs.site_config_path }}"
+
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: engine/${{ inputs.output_dir }}

@@ -9,17 +9,36 @@
 
         {% for article in articles %}
             <article class="post-item">
+                {% if article.is_pinned %}
+                <div class="post-pin-mark">{{ t('article.pinned') }}</div>
+                {% endif %}
+                <div class="post-item-layout{% if article.cover and article.cover.src %} post-item-layout--with-cover{% endif %}">
+                {% if article.cover and article.cover.src %}
+                <a class="post-cover-link" href="{{ article_url(article.id) }}" aria-label="{{ article.title or t('article.untitled') }}">
+                    <img class="post-cover-img" src="{{ site_url(article.cover.src) }}" alt="{{ article.cover.alt or article.title or t('article.untitled') }}">
+                </a>
+                {% endif %}
+                <div class="post-item-main">
                 <h2 class="post-title">
-                    <a href="{{ url_for('article_detail', slug=article.slug) }}">{{ article.title }}</a>
+                    <a href="{{ article_url(article.id) }}">{{ article.title or t('article.untitled') }}</a>
                 </h2>
                 <div class="post-meta">
                     <span class="text-muted">{{ article.date|date_i18n }}</span>
+                    {% if article.tags %}
+                    <span class="post-tags">
+                        {% for tag in article.tags %}
+                        <a class="tag-badge" href="{{ tag_url(tag) }}">{{ tag }}</a>
+                        {% endfor %}
+                    </span>
+                    {% endif %}
                 </div>
                 {% if article.summary %}
                 <div class="post-excerpt">
                     {{ article.summary|safe }}
                 </div>
                 {% endif %}
+                </div>
+                </div>
             </article>
             {% if not loop.last %}<hr class="post-divider">{% endif %}
         {% endfor %}

@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build"
+    "build": "npm run build:assets && npm run build:static",
+    "build:assets": "vite build",
+    "build:static": "python -m app.build --static --skip-assets"
   },
   "dependencies": {
     "bootstrap": "3.4.1",

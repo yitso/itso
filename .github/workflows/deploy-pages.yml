@@ -1,0 +1,54 @@
+name: Deploy GitHub Pages (Template Repo Demo)
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-engine.yml
+    with:
+      site_base: /${{ github.event.repository.name }}/
+      content_repo: ${{ github.repository }}
+      content_ref: ${{ github.ref_name }}
+      site_config_path: configs/example.json
+      output_dir: dist
+
+  package-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: package-pages
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
