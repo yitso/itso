@@ -154,4 +154,8 @@ def create_app():
 
     register_routes(app)
 
+    with app.app_context():
+        from app.services.content import _build_article_index
+        app.config["ARTICLE_INDEX"] = _build_article_index()
+
     return app
