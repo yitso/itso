@@ -418,7 +418,10 @@ def _build_article_index() -> Dict[str, Dict[str, str]]:
         if len(parts) < 3:
             continue
 
-        metadata = _parse_metadata_block(parts[1].strip())
+        try:
+            metadata = _parse_metadata_block(parts[1].strip())
+        except ValueError:
+            continue
         raw_id = metadata.get("id")
         if not raw_id:
             continue
