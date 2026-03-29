@@ -120,7 +120,7 @@
         <span class="announcement-text">{{ announcement.text }}</span>
         {% if announcement.link and announcement.link.url %}
         <span class="announcement-sep">·</span>
-        <a class="announcement-link" href="{{ announcement.link.url }}" target="_blank" rel="noopener">{{ announcement.link.label }}</a>
+        <a class="announcement-link" href="{{ announcement.link.url }}" target="_blank" rel="noopener">{{ announcement.link.label or announcement.link.url }}</a>
         {% endif %}
       </div>
     </div>
