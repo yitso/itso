@@ -1096,50 +1096,43 @@ body {
   }
 }
 /* ── Announcement Banner ─────────────────────────────────────────────────── */
-:root {
-  --announcement-height: 29px;
-}
 
 .site-announcement {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1040;
+  display: flex;
+  justify-content: center;
+  padding: 0 22px;
+  background: var(--announcement-bg, var(--bg-card));
+  border-bottom: 1px solid var(--announcement-border, var(--line));
+}
+
+.announcement-inner {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5em;
-  padding: 5px 16px;
-  font-size: 0.775rem;
+  gap: 0.35em;
+  width: 100%;
+  max-width: 780px;
+  padding: 12px 0;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  font-size: inherit;
   letter-spacing: 0.01em;
-  background: var(--announcement-bg, rgba(13, 19, 27, 0.82));
-  color: var(--announcement-text, #a0a8b2);
-  border-bottom: 1px solid var(--announcement-border, rgba(160, 168, 178, 0.18));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--announcement-text, var(--text-soft));
+}
+
+.announcement-sep {
+  color: var(--announcement-text, var(--text-soft));
+  opacity: 0.5;
 }
 
 .announcement-link {
-  color: var(--announcement-link, #d7dde4);
+  color: var(--announcement-link, var(--accent-strong));
   text-decoration: underline;
+  text-decoration-color: var(--announcement-link, var(--accent-strong));
   text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
   flex-shrink: 0;
 }
 
 .announcement-link:hover {
   opacity: 0.75;
-  text-decoration: underline;
-}
-
-/* Push navbar and content down when announcement is present */
-body:has(.site-announcement) .navbar {
-  top: var(--announcement-height);
-}
-
-body:has(.site-announcement) .main-shell {
-  margin-top: var(--announcement-height);
 }
