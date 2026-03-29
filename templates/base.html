@@ -114,6 +114,18 @@
         </div>
     </nav>
 
+    {% if announcement and announcement.enabled %}
+    <div class="site-announcement" role="note">
+      <div class="announcement-inner">
+        <span class="announcement-text">{{ announcement.text }}</span>
+        {% if announcement.link and announcement.link.url %}
+        <span class="announcement-sep">·</span>
+        <a class="announcement-link" href="{{ announcement.link.url }}" target="_blank" rel="noopener">{{ announcement.link.label or announcement.link.url }}</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
           <div class="container main-shell">
         {% block content %}{% endblock %}
     </div>

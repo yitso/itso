@@ -1095,3 +1095,44 @@ body {
     font-size: 13px;
   }
 }
+/* ── Announcement Banner ─────────────────────────────────────────────────── */
+
+.site-announcement {
+  display: flex;
+  justify-content: center;
+  padding: 0 22px;
+  background: var(--announcement-bg, var(--bg-card));
+  border-bottom: 1px solid var(--announcement-border, var(--line));
+}
+
+.announcement-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em;
+  width: 100%;
+  max-width: 780px;
+  padding: 12px 0;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  font-size: inherit;
+  letter-spacing: 0.01em;
+  color: var(--announcement-text, var(--text-soft));
+}
+
+.announcement-sep {
+  color: var(--announcement-text, var(--text-soft));
+  opacity: 0.5;
+}
+
+.announcement-link {
+  color: var(--announcement-link, var(--accent-strong));
+  text-decoration: underline;
+  text-decoration-color: var(--announcement-link, var(--accent-strong));
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  flex-shrink: 0;
+}
+
+.announcement-link:hover {
+  opacity: 0.75;
+}
