@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
+import hashlib
+import json
 import os
 import re
-import json
+import unicodedata
 from datetime import datetime
-from typing import List, Dict, Optional
 from pathlib import Path
+from typing import Dict, List, Optional
 
 import markdown
 import yaml
-from flask import current_app, abort
+from flask import abort, current_app
 
 
 META_SPLIT = "---"
@@ -35,12 +37,23 @@ def _parse_article_date(value) -> datetime:
         return value
     if hasattr(value, "year") and hasattr(value, "month") and hasattr(value, "day"):
         return datetime(value.year, value.month, value.day)
-    if isinstance(value, str) and value:
-        try:
-            return datetime.strptime(value, "%Y-%m-%d")
-        except ValueError:
-            pass
-    return datetime.now()
+    if isinstance(value, str):
+        normalized = value.strip()
+        if normalized:
+            try:
+                return datetime.strptime(normalized, "%Y-%m-%d")
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid article date {value!r}; expected YYYY-MM-DD"
+                ) from exc
+    raise ValueError("Missing or invalid article date; expected YYYY-MM-DD")
+
+
+def _parse_article_date_for_file(value, filepath: str) -> datetime:
+    try:
+        return _parse_article_date(value)
+    except ValueError as exc:
+        raise ValueError(f"{exc} in {filepath}") from exc
 
 
 def _normalize_tags(value) -> List[str]:
@@ -54,16 +67,32 @@ def _normalize_tags(value) -> List[str]:
 
 
 def slugify_tag(tag: str) -> str:
-    """
-    Convert a tag string into a URL-safe slug suitable for ``/tags/<tag>`` routes.
+    """Convert a tag into a stable Unicode-friendly URL slug.
 
-    Lowercases the input, replaces any run of non-alphanumeric characters
-    (including whitespace and ``/``) with a single ``-``, and trims leading /
-    trailing dashes.
+    Unicode letters and digits are preserved so Chinese and other non-Latin tags
+    remain distinct. Runs of punctuation/whitespace become a single dash. Tags
+    made entirely from symbols receive a deterministic hash fallback instead of
+    collapsing to an empty slug.
     """
-    slug = tag.strip().lower()
-    slug = re.sub(r"[^a-z0-9]+", "-", slug)
-    return slug.strip("-")
+    normalized = unicodedata.normalize("NFKC", str(tag)).casefold().strip()
+    slug_chars = []
+    separator_pending = False
+
+    for char in normalized:
+        if char.isalnum():
+            if separator_pending and slug_chars:
+                slug_chars.append("-")
+            slug_chars.append(char)
+            separator_pending = False
+        elif slug_chars:
+            separator_pending = True
+
+    slug = "".join(slug_chars).strip("-")
+    if slug:
+        return slug
+
+    digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:12]
+    return f"tag-{digest}"
 
 
 def _normalize_link_items(value) -> List[dict]:
@@ -342,7 +371,7 @@ def load_article_metadata() -> List[dict]:
                 raise ValueError(f"Duplicate article id '{article_id}' found in {item['filepath']}")
             id_registry.add(article_id)
 
-            date = _parse_article_date(metadata.get("date"))
+            date = _parse_article_date_for_file(metadata.get("date"), item["filepath"])
             mirror = _extract_article_mirror(metadata)
             articles.append({
                 "id": article_id,
@@ -385,7 +414,7 @@ def _load_article_content_from_file(filepath: str, slug: str) -> dict:
         return {
             "id": article_id,
             "title": metadata.get("title", ""),
-            "date": _parse_article_date(metadata.get("date")),
+            "date": _parse_article_date_for_file(metadata.get("date"), filepath),
             "slug": slug,
             "content": processed_body,
             "summary": metadata.get("summary", ""),
