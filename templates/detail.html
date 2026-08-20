@@ -2,21 +2,57 @@
 
 {% block title %}{{ article.title or t('article.untitled') }}{% endblock %}
 
-{% block seo_description %}<meta name="description" content="{{ article.summary | truncate(160, killwords=True, end='...') }}">{% endblock %}
+{% block seo_description %}
+{% set _summary = article.summary | striptags | truncate(160, killwords=True, end='...') %}
+{% if _summary %}<meta name="description" content="{{ _summary }}">{% endif %}
+{% if profile and profile.name %}<meta name="author" content="{{ profile.name }}">{% endif %}
+{% endblock %}
 
 {% block og_meta %}
-<meta property="og:type" content="article">
-<meta property="og:title" content="{{ article.title or t('article.untitled') }}">
-{% if article.summary %}<meta property="og:description" content="{{ article.summary | truncate(200, killwords=True, end='...') }}">{% endif %}
+{% set _title = article.title or t('article.untitled') %}
+{% set _summary = article.summary | striptags | truncate(200, killwords=True, end='...') %}
 {% set _canonical = canonical_url(article_url(article.id)) %}
+{% set _image = canonical_url(article.cover.src) if article.cover and article.cover.src else (canonical_url(profile.avatar.src) if profile and profile.avatar and profile.avatar.show and profile.avatar.src else '') %}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ _title }} | {{ site.title }}">
+{% if _summary %}<meta property="og:description" content="{{ _summary }}">{% endif %}
 {% if _canonical %}<meta property="og:url" content="{{ _canonical }}">{% endif %}
-<meta name="twitter:title" content="{{ article.title or t('article.untitled') }}">
-{% if article.summary %}<meta name="twitter:description" content="{{ article.summary | truncate(200, killwords=True, end='...') }}">{% endif %}
+{% if _image %}<meta property="og:image" content="{{ _image }}">{% endif %}
+{% if article.cover and article.cover.alt %}<meta property="og:image:alt" content="{{ article.cover.alt }}">{% endif %}
+<meta property="article:published_time" content="{{ article.date.strftime('%Y-%m-%dT00:00:00Z') }}">
+{% for tag in article.tags %}<meta property="article:tag" content="{{ tag }}">{% endfor %}
+<meta name="twitter:card" content="{% if _image %}summary_large_image{% else %}summary{% endif %}">
+<meta name="twitter:title" content="{{ _title }} | {{ site.title }}">
+{% if _summary %}<meta name="twitter:description" content="{{ _summary }}">{% endif %}
+{% if _image %}<meta name="twitter:image" content="{{ _image }}">{% endif %}
 {% endblock %}
 
 {% block canonical_link %}
 {% set _canonical = canonical_url(article_url(article.id)) %}
 {% if _canonical %}<link rel="canonical" href="{{ _canonical }}">{% endif %}
+{% endblock %}
+
+{% block structured_data %}
+{% set _canonical = canonical_url(article_url(article.id)) %}
+{% set _image = canonical_url(article.cover.src) if article.cover and article.cover.src else '' %}
+{% if _canonical %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ (article.title or t('article.untitled')) | tojson }},
+  "url": {{ _canonical | tojson }},
+  "mainEntityOfPage": {{ _canonical | tojson }},
+  "datePublished": {{ article.date.strftime('%Y-%m-%d') | tojson }}{% if article.summary %},
+  "description": {{ (article.summary | striptags | truncate(200, killwords=True, end='...')) | tojson }}{% endif %}{% if profile and profile.name %},
+  "author": {
+    "@type": "Person",
+    "name": {{ profile.name | tojson }}
+  }{% endif %}{% if _image %},
+  "image": {{ _image | tojson }}{% endif %}
+}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -29,7 +65,7 @@
             <header class="post-header">
                 <h1 class="post-title">{{ article.title or t('article.untitled') }}</h1>
                 <div class="post-meta">
-                    <time class="text-muted">{{ article.date|date_i18n }}</time>
+                    <time class="text-muted" datetime="{{ article.date.strftime('%Y-%m-%d') }}">{{ article.date|date_i18n }}</time>
           {% if article.tags %}
           <span class="post-tags">
             {% for tag in article.tags %}
