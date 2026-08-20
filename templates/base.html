@@ -67,14 +67,44 @@
     {% endif %}
 
     {# --- SEO --- #}
-    {% block seo_description %}{% if site.description %}<meta name="description" content="{{ site.description }}">{% endif %}{% endblock %}
+    {% set _page_title = self.title() | striptags | trim %}
+    {% set _description = self.seo_description_text() | striptags | trim %}
+    {% set _seo_type = self.seo_type() | striptags | trim %}
+    {% set _seo_image = self.seo_image() | striptags | trim %}
+    {% if _description %}<meta name="description" content="{{ _description }}">{% endif %}
+    {% block robots_meta %}<meta name="robots" content="index,follow">{% endblock %}
     <meta property="og:site_name" content="{{ site.title }}">
-    {% block og_meta %}
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ site.title }}">
+    <meta property="og:type" content="{{ _seo_type or 'website' }}">
+    <meta property="og:title" content="{{ _page_title }}{% if _page_title and _page_title != site.title %} | {{ site.title }}{% endif %}">
+    {% if _description %}<meta property="og:description" content="{{ _description }}">{% endif %}
+    {% if _seo_image %}<meta property="og:image" content="{{ _seo_image }}">{% endif %}
+    <meta name="twitter:card" content="{% if _seo_image %}summary_large_image{% else %}summary{% endif %}">
+    <meta name="twitter:title" content="{{ _page_title }}{% if _page_title and _page_title != site.title %} | {{ site.title }}{% endif %}">
+    {% if _description %}<meta name="twitter:description" content="{{ _description }}">{% endif %}
+    {% if _seo_image %}<meta name="twitter:image" content="{{ _seo_image }}">{% endif %}
+    {% block seo_extra %}{% endblock %}
+    {% block canonical_link %}
+    {% set _canonical = canonical_url('/') %}
+    {% if _canonical %}<link rel="canonical" href="{{ _canonical }}"><meta property="og:url" content="{{ _canonical }}">{% endif %}
     {% endblock %}
-    <meta name="twitter:card" content="summary">
-    {% block canonical_link %}{% endblock %}
+    {% set _feed_url = canonical_url('/feed.xml') %}
+    {% if _feed_url %}<link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ _feed_url }}">{% endif %}
+    {% set _site_url = canonical_url('/') %}
+    {% if _site_url %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": {{ site.title | tojson }},
+      "url": {{ _site_url | tojson }}{% if _description %},
+      "description": {{ _description | tojson }}{% endif %}
+    }
+    </script>
+    {% endif %}
+    {% block structured_data %}{% endblock %}
+    {% block seo_description_text %}{{ site.description or profile.tagline or '' }}{% endblock %}
+    {% block seo_type %}website{% endblock %}
+    {% block seo_image %}{% if profile and profile.avatar and profile.avatar.show and profile.avatar.src %}{{ canonical_url(profile.avatar.src) }}{% endif %}{% endblock %}
 </head>
 <body data-theme="{{ theme.id if theme else 'default' }}">
     <div class="site-bg"></div>
