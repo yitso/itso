@@ -68,21 +68,21 @@
 
     {# --- SEO --- #}
     {% set _page_title = self.title() | striptags | trim %}
-    {% set _description = self.seo_description_text() | striptags | trim %}
-    {% set _seo_type = self.seo_type() | striptags | trim %}
-    {% set _seo_image = self.seo_image() | striptags | trim %}
-    {% if _description %}<meta name="description" content="{{ _description }}">{% endif %}
+    {% set _default_description = (site.description or profile.tagline or '') | striptags | trim %}
+    {% set _default_image = canonical_url(profile.avatar.src) if profile and profile.avatar and profile.avatar.show and profile.avatar.src else '' %}
+    {% block seo_description %}{% if _default_description %}<meta name="description" content="{{ _default_description }}">{% endif %}{% endblock %}
     {% block robots_meta %}<meta name="robots" content="index,follow">{% endblock %}
     <meta property="og:site_name" content="{{ site.title }}">
-    <meta property="og:type" content="{{ _seo_type or 'website' }}">
+    {% block og_meta %}
+    <meta property="og:type" content="website">
     <meta property="og:title" content="{{ _page_title }}{% if _page_title and _page_title != site.title %} | {{ site.title }}{% endif %}">
-    {% if _description %}<meta property="og:description" content="{{ _description }}">{% endif %}
-    {% if _seo_image %}<meta property="og:image" content="{{ _seo_image }}">{% endif %}
-    <meta name="twitter:card" content="{% if _seo_image %}summary_large_image{% else %}summary{% endif %}">
+    {% if _default_description %}<meta property="og:description" content="{{ _default_description }}">{% endif %}
+    {% if _default_image %}<meta property="og:image" content="{{ _default_image }}">{% endif %}
+    <meta name="twitter:card" content="{% if _default_image %}summary_large_image{% else %}summary{% endif %}">
     <meta name="twitter:title" content="{{ _page_title }}{% if _page_title and _page_title != site.title %} | {{ site.title }}{% endif %}">
-    {% if _description %}<meta name="twitter:description" content="{{ _description }}">{% endif %}
-    {% if _seo_image %}<meta name="twitter:image" content="{{ _seo_image }}">{% endif %}
-    {% block seo_extra %}{% endblock %}
+    {% if _default_description %}<meta name="twitter:description" content="{{ _default_description }}">{% endif %}
+    {% if _default_image %}<meta name="twitter:image" content="{{ _default_image }}">{% endif %}
+    {% endblock %}
     {% block canonical_link %}
     {% set _canonical = canonical_url('/') %}
     {% if _canonical %}<link rel="canonical" href="{{ _canonical }}"><meta property="og:url" content="{{ _canonical }}">{% endif %}
@@ -96,15 +96,12 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": {{ site.title | tojson }},
-      "url": {{ _site_url | tojson }}{% if _description %},
-      "description": {{ _description | tojson }}{% endif %}
+      "url": {{ _site_url | tojson }}{% if _default_description %},
+      "description": {{ _default_description | tojson }}{% endif %}
     }
     </script>
     {% endif %}
     {% block structured_data %}{% endblock %}
-    {% block seo_description_text %}{{ site.description or profile.tagline or '' }}{% endblock %}
-    {% block seo_type %}website{% endblock %}
-    {% block seo_image %}{% if profile and profile.avatar and profile.avatar.show and profile.avatar.src %}{{ canonical_url(profile.avatar.src) }}{% endif %}{% endblock %}
 </head>
 <body data-theme="{{ theme.id if theme else 'default' }}">
     <div class="site-bg"></div>
