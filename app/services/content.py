@@ -3,8 +3,10 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import unicodedata
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -46,10 +48,97 @@ def _parse_article_date(value) -> datetime:
                 raise ValueError(
                     f"Invalid article date {value!r}; expected YYYY-MM-DD"
                 ) from exc
-    raise ValueError("Missing or invalid article date; expected YYYY-MM-DD")
+    raise ValueError("Invalid article date; expected YYYY-MM-DD")
+
+
+def _article_date_is_missing(value) -> bool:
+    return value is None or (isinstance(value, str) and not value.strip())
+
+
+@lru_cache(maxsize=None)
+def _git_file_created_date(filepath: str) -> Optional[datetime]:
+    """Return the oldest Git add date for a file, following renames when possible."""
+    path = Path(filepath).resolve()
+    try:
+        repo_result = subprocess.run(
+            ["git", "-C", str(path.parent), "rev-parse", "--show-toplevel"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        repo_root = Path(repo_result.stdout.strip()).resolve()
+        relative_path = path.relative_to(repo_root).as_posix()
+        log_result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo_root),
+                "log",
+                "--follow",
+                "--diff-filter=A",
+                "--format=%ad",
+                "--date=short",
+                "--",
+                relative_path,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (
+        FileNotFoundError,
+        OSError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+        ValueError,
+    ):
+        return None
+
+    # git log is newest-first. If a file was deleted/re-added, prefer the oldest
+    # add event as the closest approximation of its original creation date.
+    dates = [line.strip() for line in log_result.stdout.splitlines() if line.strip()]
+    for value in reversed(dates):
+        try:
+            return datetime.strptime(value, "%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
+
+
+@lru_cache(maxsize=None)
+def _filesystem_file_created_date(filepath: str) -> Optional[datetime]:
+    """Best-effort filesystem creation date fallback.
+
+    Prefer a real birth time when the platform exposes it. Otherwise use ctime,
+    which is creation time on Windows and metadata-change time on Unix systems.
+    """
+    try:
+        stat_result = Path(filepath).stat()
+    except OSError:
+        return None
+
+    timestamp = getattr(stat_result, "st_birthtime", None)
+    if timestamp is None:
+        timestamp = getattr(stat_result, "st_ctime", None)
+    if timestamp is None:
+        return None
+
+    try:
+        return datetime.fromtimestamp(timestamp)
+    except (OSError, OverflowError, ValueError):
+        return None
 
 
 def _parse_article_date_for_file(value, filepath: str) -> datetime:
+    if _article_date_is_missing(value):
+        return (
+            _git_file_created_date(filepath)
+            or _filesystem_file_created_date(filepath)
+            or datetime.now()
+        )
+
     try:
         return _parse_article_date(value)
     except ValueError as exc:
