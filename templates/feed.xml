@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{{ lang }}">
+  <title>{{ site.title }}</title>
+  {% set _home = canonical_url('/') %}
+  {% set _feed = canonical_url('/feed.xml') %}
+  <link href="{{ _home }}"/>
+  <link href="{{ _feed }}" rel="self" type="application/atom+xml"/>
+  <id>{{ _home }}</id>
+  <updated>{{ feed_updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}</updated>
+  {% set _description = (site.description or profile.tagline or '') | striptags | trim %}
+  {% if _description %}<subtitle>{{ _description }}</subtitle>{% endif %}
+  <author>
+    <name>{{ profile.name if profile and profile.name else site.title }}</name>
+  </author>
+  {% for article in feed_articles %}
+  {% set _url = canonical_url(article_url(article.id)) %}
+  <entry>
+    <title>{{ article.title or t('article.untitled') }}</title>
+    <link href="{{ _url }}"/>
+    <id>{{ _url }}</id>
+    <published>{{ article.date.strftime('%Y-%m-%dT00:00:00Z') }}</published>
+    <updated>{{ article.date.strftime('%Y-%m-%dT00:00:00Z') }}</updated>
+    {% if article.summary %}<summary type="text">{{ article.summary | striptags }}</summary>{% endif %}
+    {% for tag in article.tags %}<category term="{{ tag }}"/>{% endfor %}
+  </entry>
+  {% endfor %}
+</feed>
