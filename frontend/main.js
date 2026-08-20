@@ -1,5 +1,5 @@
-
 import './style.css';
+import './article-reading.css';
 
 import $ from 'jquery'
 
@@ -136,6 +136,104 @@ function setupColorModeToggle() {
   }
 }
 
+function slugifyHeading(text) {
+  var slug = (text || '').trim().toLowerCase()
+  if (slug.normalize) {
+    slug = slug.normalize('NFKC')
+  }
+  return slug
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\u00c0-\uffff-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+function setupArticleReading() {
+  var layout = document.getElementById('article-reading-layout')
+  var content = document.getElementById('post-content')
+  var toc = document.getElementById('post-toc')
+  var tocList = document.getElementById('post-toc-list')
+  if (!layout || !content || !toc || !tocList) return
+
+  var headings = content.querySelectorAll('h2, h3, h4')
+  if (!headings.length) return
+
+  var headingLinkLabel = toc.getAttribute('data-heading-link-label') || 'Link to section'
+  var usedIds = {}
+  var tocLinks = {}
+
+  for (var i = 0; i < headings.length; i++) {
+    var heading = headings[i]
+    var headingText = (heading.textContent || '').trim()
+    var baseId = heading.id || slugifyHeading(headingText) || ('section-' + (i + 1))
+    var headingId = baseId
+    var suffix = 2
+
+    while (usedIds[headingId] || (document.getElementById(headingId) && document.getElementById(headingId) !== heading)) {
+      headingId = baseId + '-' + suffix
+      suffix += 1
+    }
+
+    usedIds[headingId] = true
+    heading.id = headingId
+
+    var anchor = document.createElement('a')
+    anchor.className = 'heading-anchor'
+    anchor.href = '#' + encodeURIComponent(headingId)
+    anchor.setAttribute('aria-label', headingLinkLabel + ': ' + headingText)
+    anchor.textContent = '#'
+    heading.appendChild(anchor)
+
+    var item = document.createElement('li')
+    item.className = 'post-toc-item post-toc-item--level-' + heading.tagName.slice(1)
+
+    var link = document.createElement('a')
+    link.className = 'post-toc-link'
+    link.href = '#' + encodeURIComponent(headingId)
+    link.textContent = headingText
+
+    item.appendChild(link)
+    tocList.appendChild(item)
+    tocLinks[headingId] = link
+  }
+
+  toc.removeAttribute('hidden')
+  layout.classList.add('has-toc')
+
+  var setActiveHeading = function (headingId) {
+    var keys = Object.keys(tocLinks)
+    for (var i = 0; i < keys.length; i++) {
+      tocLinks[keys[i]].classList.toggle('is-active', keys[i] === headingId)
+    }
+  }
+
+  setActiveHeading(headings[0].id)
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      var visible = []
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) {
+          visible.push(entries[i])
+        }
+      }
+      if (!visible.length) return
+
+      visible.sort(function (a, b) {
+        return a.boundingClientRect.top - b.boundingClientRect.top
+      })
+      setActiveHeading(visible[0].target.id)
+    }, {
+      rootMargin: '-92px 0px -68% 0px',
+      threshold: 0
+    })
+
+    for (var j = 0; j < headings.length; j++) {
+      observer.observe(headings[j])
+    }
+  }
+}
+
 window.toggleQR = function toggleQR(el) {
   var $target = $(el).closest('.social-link').find('.social-qr')
   if (!$target.length) {
@@ -147,6 +245,7 @@ window.toggleQR = function toggleQR(el) {
 
 $(function () {
   setupColorModeToggle()
+  setupArticleReading()
   var mermaidBlocks = []
   $('pre > code.language-mermaid').each(function () {
     var rawHtml = $(this).html()
