@@ -107,6 +107,7 @@ Optional token overrides can be added per site config:
 	"overrides": {
 		"accent": "#7cf6cf"
 	}
+}
 ```
 
 ## GitHub Pages (Project Site)
