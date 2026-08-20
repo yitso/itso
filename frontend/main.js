@@ -1,13 +1,14 @@
 
 import './style.css';
 
-import $ from 'jquery'
-
 import 'highlight.js/styles/github-dark.css';
 import hljs from 'highlight.js';
 import mermaid from 'mermaid';
 
-window.$ = window.jQuery = $
+var $ = window.jQuery
+if (!$) {
+  throw new Error('Itso requires jQuery to be loaded before frontend/main.js')
+}
 
 var COLOR_MODE_STORAGE_KEY = 'itso-color-mode'
 var COLOR_MODES = ['system', 'light', 'dark']

@@ -71,6 +71,7 @@ jobs:
           repository: ${{ inputs.content_repo != '' && inputs.content_repo || github.repository }}
           ref: ${{ inputs.content_ref }}
           token: ${{ secrets.content_repo_token || github.token }}
+          fetch-depth: 0
           path: content
 
       - name: Setup Node
