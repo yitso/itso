@@ -211,6 +211,21 @@ function setupArticleReading() {
 
   setActiveHeading(headings[0].id)
 
+  if (window.location.hash) {
+    var hashId = window.location.hash.slice(1)
+    try {
+      hashId = decodeURIComponent(hashId)
+    } catch (err) {
+      // Keep the raw fragment when it is not valid percent-encoding.
+    }
+    var hashTarget = document.getElementById(hashId)
+    if (hashTarget && content.contains(hashTarget)) {
+      window.requestAnimationFrame(function () {
+        hashTarget.scrollIntoView({ block: 'start' })
+      })
+    }
+  }
+
   if ('IntersectionObserver' in window) {
     var observer = new IntersectionObserver(function (entries) {
       var visible = []
