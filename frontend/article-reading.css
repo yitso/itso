@@ -1,0 +1,208 @@
+.article-reading-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 760px);
+    justify-content: center;
+    align-items: start;
+    gap: 30px;
+    margin-top: 10px;
+}
+
+.article-reading-layout.has-toc {
+    grid-template-columns: minmax(190px, 220px) minmax(0, 760px);
+}
+
+.post-toc[hidden] {
+    display: none;
+}
+
+.post-toc {
+    position: sticky;
+    top: 92px;
+    max-height: calc(100vh - 116px);
+    overflow: auto;
+    padding: 16px 14px;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    background: var(--bg-card);
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.post-toc-title {
+    margin-bottom: 10px;
+    color: var(--text-main);
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.post-toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.post-toc-item + .post-toc-item {
+    margin-top: 5px;
+}
+
+.post-toc-item--level-3 {
+    padding-left: 12px;
+}
+
+.post-toc-item--level-4 {
+    padding-left: 24px;
+}
+
+.post-toc-link {
+    display: block;
+    padding: 3px 6px;
+    border-left: 2px solid transparent;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.post-toc-link:hover,
+.post-toc-link:focus,
+.post-toc-link.is-active {
+    color: var(--accent-strong);
+    border-left-color: var(--accent);
+    background: var(--tag-bg);
+    outline: none;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+    scroll-margin-top: 92px;
+}
+
+.heading-anchor {
+    margin-left: 0.32em;
+    color: var(--accent);
+    font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    font-size: 0.65em;
+    font-weight: 500;
+    text-decoration: none;
+    opacity: 0.55;
+    vertical-align: middle;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.heading-anchor:hover,
+.heading-anchor:focus {
+    color: var(--accent-strong);
+    opacity: 1;
+    outline: none;
+}
+
+@media (hover: hover) {
+    .post-content h2 .heading-anchor,
+    .post-content h3 .heading-anchor,
+    .post-content h4 .heading-anchor {
+        opacity: 0;
+    }
+
+    .post-content h2:hover .heading-anchor,
+    .post-content h3:hover .heading-anchor,
+    .post-content h4:hover .heading-anchor,
+    .heading-anchor:focus {
+        opacity: 1;
+    }
+}
+
+.post-neighbors {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 38px;
+    padding-top: 24px;
+    border-top: 1px solid var(--header-divider);
+}
+
+.post-neighbor {
+    display: flex;
+    min-height: 104px;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--promo-bg);
+    color: var(--text-main);
+    text-decoration: none;
+    transition: border-color 0.18s ease, transform 0.18s ease, background-color 0.18s ease;
+}
+
+.post-neighbor:hover,
+.post-neighbor:focus {
+    border-color: var(--accent);
+    color: var(--text-main);
+    text-decoration: none;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.post-neighbor--next {
+    text-align: right;
+}
+
+.post-neighbor-label {
+    margin-bottom: 5px;
+    color: var(--accent-strong);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.post-neighbor-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+@media (max-width: 991px) {
+    .article-reading-layout.has-toc {
+        grid-template-columns: minmax(0, 760px);
+    }
+
+    .post-toc {
+        position: static;
+        max-height: 42vh;
+    }
+}
+
+@media (max-width: 767px) {
+    .article-reading-layout {
+        gap: 14px;
+        margin-top: 0;
+    }
+
+    .post-toc {
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .post-neighbors {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 30px;
+        padding-top: 18px;
+    }
+
+    .post-neighbor-placeholder {
+        display: none;
+    }
+
+    .post-neighbor--next {
+        text-align: left;
+    }
+
+    .post-neighbor {
+        min-height: 0;
+    }
+}
