@@ -1,0 +1,20 @@
+name: Check Article Reading Branch
+
+on:
+  push:
+    branches:
+      - feat/article-reading-navigation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-engine.yml
+    with:
+      site_base: /itso/
+      content_repo: yitso/itso
+      content_ref: feat/article-reading-navigation
+      site_config_path: configs/example.json
+      output_dir: dist
