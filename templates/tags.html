@@ -4,7 +4,7 @@
 
 {% block canonical_link %}
 {% set _url = canonical_url(page_url('/tags/')) %}
-{% if _url %}<link rel="canonical" href="{{ _url }}">{% endif %}
+{% if _url %}<link rel="canonical" href="{{ _url }}"><meta property="og:url" content="{{ _url }}">{% endif %}
 {% endblock %}
 
 {% block content %}

@@ -16,11 +16,13 @@ from app.config import get_config
 def _vite_manifest_path(dist_path):
     return dist_path / ".vite" / "manifest.json"
 
+
 @lru_cache
 def vite_manifest(out_dir: str):
     path = _vite_manifest_path(Path(out_dir))
     with open(path, "r") as fd:
         return json.load(fd)
+
 
 def maybe_build_assets(_out_dir: str):
     """
@@ -55,7 +57,7 @@ def maybe_build_assets(_out_dir: str):
                 ["npm", "install", "--no-audit", "--no-fund"],
                 cwd=str(root_dir),
                 check=True,
-                env=env
+                env=env,
             )
 
     # Run build
@@ -119,11 +121,11 @@ def _write_build_manifest(site_dir: Path, cfg, article_count: int):
 def build_static_site(cfg, skip_assets: bool = False):
     from app import create_app
     from app.services.content import (
-        load_article_content_by_slug,
-        load_article_metadata,
         get_all_tags,
         get_articles_by_tag,
         get_site_config,
+        load_article_content_by_slug,
+        load_article_metadata,
     )
 
     if not skip_assets:
@@ -160,7 +162,10 @@ def build_static_site(cfg, skip_assets: bool = False):
         for item in articles:
             article = load_article_content_by_slug(item["slug"])
             if article is None:
-                print(f"[site] warning: could not load content for article id={item['id']} slug={item['slug']}, skipping")
+                print(
+                    f"[site] warning: could not load content for article "
+                    f"id={item['id']} slug={item['slug']}, skipping"
+                )
                 continue
             _write_html(
                 site_dir,
@@ -178,18 +183,40 @@ def build_static_site(cfg, skip_assets: bool = False):
             _write_html(
                 site_dir,
                 f"tags/{tag_info['slug']}/index.html",
-                render_template("tag.html", tag=tag_info["slug"], display_tag=tag_info["tag"], articles=tag_articles),
+                render_template(
+                    "tag.html",
+                    tag=tag_info["slug"],
+                    display_tag=tag_info["tag"],
+                    articles=tag_articles,
+                ),
             )
 
-        # Generate sitemap.xml and robots.txt
+        # Generate sitemap.xml, robots.txt, and Atom feed when absolute URLs are configured.
         site_cfg_data = get_site_config()
         base_url = (site_cfg_data.get("base_url") or "").rstrip("/")
         if base_url:
             sitemap_xml = render_template("sitemap.xml", articles=articles, tags=tags)
             (site_dir / "sitemap.xml").write_text(sitemap_xml, encoding="utf-8")
+
+            feed_articles = sorted(
+                articles,
+                key=lambda article: article["date"],
+                reverse=True,
+            )[:20]
+            feed_updated = max(
+                (article["date"] for article in feed_articles),
+                default=datetime.utcnow(),
+            )
+            feed_xml = render_template(
+                "feed.xml",
+                feed_articles=feed_articles,
+                feed_updated=feed_updated,
+            )
+            (site_dir / "feed.xml").write_text(feed_xml, encoding="utf-8")
+
             robots_content = f"User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n"
             (site_dir / "robots.txt").write_text(robots_content, encoding="utf-8")
-            print(f"[site] generated sitemap.xml and robots.txt")
+            print("[site] generated sitemap.xml, robots.txt, and feed.xml")
 
     _write_build_manifest(site_dir, cfg, len(articles))
 

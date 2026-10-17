@@ -64,6 +64,24 @@ Preview static output locally:
 npx serve dist
 ```
 
+## SEO and Feed
+
+Set an absolute `base_url` in the site config to enable absolute canonical/social URLs and generated discovery files:
+
+```json
+{
+  "base_url": "https://example.com"
+}
+```
+
+When `base_url` is configured, static builds generate:
+
+- `sitemap.xml`
+- `robots.txt`
+- `feed.xml` (Atom 1.0, latest 20 posts)
+
+Pages also expose canonical links, Open Graph/Twitter metadata, feed autodiscovery, a site-level `WebSite` JSON-LD object, and article-level `BlogPosting` structured data. Article cover images are preferred for social previews; the configured profile avatar is used as the site-level fallback.
+
 ## Theme Configuration (Pluggable)
 
 Theme selection is configuration-driven and fixed at build/runtime startup.
@@ -111,4 +129,3 @@ Engine reusable workflow:
 - `.github/workflows/build-engine.yml`
 
 Use it from your content repository to build static pages from external markdown/config sources.
-

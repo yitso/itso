@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, abort, Response, redirect, url_for
+from datetime import datetime
+
+from flask import Response, abort, redirect, render_template, url_for
 from werkzeug.exceptions import NotFound
+
 from app.services.content import (
-    load_article_metadata,
-    load_article_content,
-    load_article_content_by_slug,
     get_all_tags,
     get_articles_by_tag,
     get_site_config,
+    load_article_content,
+    load_article_content_by_slug,
+    load_article_metadata,
     slugify_tag,
 )
+
 
 def register_routes(app):
     @app.route("/", strict_slashes=False)
@@ -50,6 +54,27 @@ def register_routes(app):
             tag,
         )
         return render_template("tag.html", tag=tag, display_tag=display_tag, articles=articles)
+
+    @app.route("/feed.xml")
+    def feed():
+        site_cfg = get_site_config()
+        if not (site_cfg.get("base_url") or "").strip():
+            abort(404)
+        feed_articles = sorted(
+            load_article_metadata(),
+            key=lambda article: article["date"],
+            reverse=True,
+        )[:20]
+        feed_updated = max(
+            (article["date"] for article in feed_articles),
+            default=datetime.utcnow(),
+        )
+        xml = render_template(
+            "feed.xml",
+            feed_articles=feed_articles,
+            feed_updated=feed_updated,
+        )
+        return Response(xml, mimetype="application/atom+xml")
 
     @app.route("/sitemap.xml")
     def sitemap():

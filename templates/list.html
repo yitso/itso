@@ -2,6 +2,11 @@
 
 {% block title %}{{ t('page.all_articles.title') }}{% endblock %}
 
+{% block canonical_link %}
+{% set _url = canonical_url(posts_url) %}
+{% if _url %}<link rel="canonical" href="{{ _url }}"><meta property="og:url" content="{{ _url }}">{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
