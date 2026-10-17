@@ -11,6 +11,26 @@ from app.services.content import (
     slugify_tag,
 )
 
+
+def _get_article_neighbors(article_id):
+    """Return the older (previous) and newer (next) articles by publish date."""
+    articles = sorted(
+        load_article_metadata(),
+        key=lambda item: (item["date"], item["id"]),
+        reverse=True,
+    )
+
+    for index, article in enumerate(articles):
+        if article["id"] != article_id:
+            continue
+
+        previous_article = articles[index + 1] if index + 1 < len(articles) else None
+        next_article = articles[index - 1] if index > 0 else None
+        return previous_article, next_article
+
+    return None, None
+
+
 def register_routes(app):
     @app.route("/", strict_slashes=False)
     def index():
@@ -27,7 +47,13 @@ def register_routes(app):
     def article_detail(article_ref):
         try:
             article = load_article_content(article_ref)
-            return render_template("detail.html", article=article)
+            previous_article, next_article = _get_article_neighbors(article["id"])
+            return render_template(
+                "detail.html",
+                article=article,
+                previous_article=previous_article,
+                next_article=next_article,
+            )
         except NotFound:
             article = load_article_content_by_slug(article_ref)
             if not article:
