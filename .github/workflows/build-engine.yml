@@ -106,3 +106,4 @@ jobs:
         with:
           name: site-dist
           path: engine/${{ inputs.output_dir }}
+          include-hidden-files: true
