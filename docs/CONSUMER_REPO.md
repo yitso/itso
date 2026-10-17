@@ -85,4 +85,6 @@ jobs:
 ## Cross-organization/private repository notes
 
 - For private content repositories across organizations, pass `content_repo_token` secret when calling reusable workflow.
-- Pin a stable engine tag instead of `@main` once version tags are published.
+- Pin the reusable workflow to a full commit SHA for reproducible builds, or use a stable release tag once published, instead of `@main`.
+- The engine is checked out from the reusable workflow's repository at its resolved commit (`job.workflow_repository` / `job.workflow_sha`). The caller's repository/ref is used only for content; no separate engine ref input is needed. A tag or branch moving after workflow resolution cannot change the engine source used in that run.
+- This workflow targets GitHub.com. The workflow identity properties in the `job` context are not available on GitHub Enterprise Server. See the [GitHub context reference](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#job-context).
