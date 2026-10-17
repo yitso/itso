@@ -48,21 +48,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Resolve engine repo/ref
-        id: engine
-        shell: bash
-        run: |
-          workflow_ref="${{ github.workflow_ref }}"
-          engine_repo="${workflow_ref%%/.github/workflows/*}"
-          engine_ref="${workflow_ref##*@}"
-          echo "repo=${engine_repo}" >> "$GITHUB_OUTPUT"
-          echo "ref=${engine_ref}" >> "$GITHUB_OUTPUT"
-
+      # The github context identifies the caller; job.workflow_* identifies
+      # this reusable workflow and its resolved commit, even when pinned by tag.
       - name: Checkout engine repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ steps.engine.outputs.repo }}
-          ref: ${{ steps.engine.outputs.ref }}
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
           path: engine
 
       - name: Checkout content repository
@@ -114,3 +106,4 @@ jobs:
         with:
           name: site-dist
           path: engine/${{ inputs.output_dir }}
+          include-hidden-files: true
